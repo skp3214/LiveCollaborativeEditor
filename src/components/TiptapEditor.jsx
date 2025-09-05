@@ -198,19 +198,7 @@ export default function TiptapEditor({ onContentChange }) {
 
   const editor = useEditor({
     extensions,
-    content: `
-<h2>Welcome to your AI-Powered Collaborative Editor</h2>
-<p>This is a powerful editor with AI assistance. You can:</p>
-<ul>
-  <li>Select text to see AI editing options</li>
-  <li>Use the chat sidebar to ask questions about your content</li>
-  <li>Apply AI suggestions with preview</li>
-</ul>
-<p>Try selecting some text to see the floating toolbar in action!</p>
-<blockquote>
-  The future of writing is collaborative - between human creativity and AI assistance.
-</blockquote>
-`,
+    content: `<p>Start writing...</p>`,
     onUpdate: ({ editor }) => {
       const content = editor.getHTML()
       onContentChange?.(content)
@@ -284,23 +272,15 @@ export default function TiptapEditor({ onContentChange }) {
   }, [editor])
 
   const handleConfirmEdit = useCallback(() => {
-    console.log('handleConfirmEdit called')
-    console.log('editor:', !!editor)
-    console.log('previewData.suggested:', previewData.suggested)
-    console.log('selectionRange:', selectionRange)
-    
     if (!editor || !previewData.suggested || selectionRange.from === selectionRange.to) {
-      console.log('Early return due to missing data')
       return
     }
 
     // Use the stored selection range instead of current selection
     const { from, to } = selectionRange
-    console.log('Replacing text from', from, 'to', to, 'with:', previewData.suggested)
     
     try {
       editor.chain().focus().deleteRange({ from, to }).insertContent(previewData.suggested).run()
-      console.log('Text replacement successful')
     } catch (error) {
       console.error('Error replacing text:', error)
     }
@@ -309,8 +289,6 @@ export default function TiptapEditor({ onContentChange }) {
     setSelectedText('')
     setToolbarPosition(null)
     setSelectionRange({ from: 0, to: 0 })
-    
-    console.log('Modal should be closed now')
   }, [editor, previewData.suggested, selectionRange])
 
   const handleCancelEdit = useCallback(() => {
