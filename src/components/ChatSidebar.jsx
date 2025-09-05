@@ -205,23 +205,24 @@ const ChatSidebar = ({ editorContent, onAIEdit, editor }) => {
   }
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-slate-50 to-white border-l border-gray-200 shadow-xl">
+    <div className="flex flex-col h-full bg-gradient-to-b from-gray-900 via-black to-gray-800 border-l border-gray-600/30 shadow-2xl">
       {/* Header */}
-      <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-purple-600">
-        <div className="flex items-center space-x-3">
+      <div className="p-6 border-b border-gray-600/50 bg-gradient-to-r from-gray-800 to-black relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-700/20 to-transparent"></div>
+        <div className="relative flex items-center space-x-3">
           <div className="relative">
             <Bot className="w-8 h-8 text-white" />
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white"></div>
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-gray-300 rounded-full border-2 border-black animate-pulse"></div>
           </div>
           <div>
             <h2 className="text-xl font-bold text-white">AI Assistant</h2>
-            <p className="text-blue-100 text-sm">Ready to help with your writing</p>
+            <p className="text-gray-300 text-sm">Ready to help with your writing</p>
           </div>
         </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-gray-50/50 to-white">
+      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-b from-gray-900/50 to-black">
         {messages.map((message) => (
           <div
             key={message.id}
@@ -231,27 +232,27 @@ const ChatSidebar = ({ editorContent, onAIEdit, editor }) => {
           >
             {message.type === 'ai' && (
               <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                <div className="w-10 h-10 bg-gradient-to-br from-gray-600 to-gray-800 rounded-full flex items-center justify-center shadow-lg ring-2 ring-gray-500/30">
                   <Bot className="w-5 h-5 text-white" />
                 </div>
               </div>
             )}
             
             <div
-              className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-sm ${
+              className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-lg ${
                 message.type === 'user'
-                  ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-br-md'
-                  : 'bg-white text-gray-800 border border-gray-100 rounded-bl-md shadow-md'
+                  ? 'bg-gradient-to-r from-gray-700 to-gray-800 text-white rounded-br-md border border-gray-600/30'
+                  : 'bg-gray-800/80 text-gray-100 border border-gray-600/30 rounded-bl-md shadow-xl backdrop-blur-sm'
               }`}
             >
               <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
               
               {/* Insert to Editor button for AI messages */}
               {message.type === 'ai' && message.id !== 1 && (
-                <div className="mt-3 pt-3 border-t border-gray-100">
+                <div className="mt-3 pt-3 border-t border-gray-600/30">
                   <button
                     onClick={() => insertToEditor(message.content)}
-                    className="inline-flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors duration-200"
+                    className="inline-flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-gray-300 bg-gray-900/50 hover:bg-gray-700/50 rounded-lg transition-all duration-200 border border-gray-600/30 hover:border-gray-500/50"
                   >
                     <Plus className="w-3 h-3" />
                     <span>Insert to Editor</span>
@@ -262,7 +263,7 @@ const ChatSidebar = ({ editorContent, onAIEdit, editor }) => {
 
             {message.type === 'user' && (
               <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center shadow-lg">
+                <div className="w-10 h-10 bg-gradient-to-br from-gray-500 to-gray-700 rounded-full flex items-center justify-center shadow-lg ring-2 ring-gray-500/30">
                   <User className="w-5 h-5 text-white" />
                 </div>
               </div>
@@ -273,11 +274,11 @@ const ChatSidebar = ({ editorContent, onAIEdit, editor }) => {
         {isLoading && (
           <div className="flex items-start space-x-3">
             <div className="flex-shrink-0">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+              <div className="w-10 h-10 bg-gradient-to-br from-gray-600 to-gray-800 rounded-full flex items-center justify-center shadow-lg ring-2 ring-gray-500/30">
                 <Bot className="w-5 h-5 text-white" />
               </div>
             </div>
-            <div className="bg-white text-gray-800 px-4 py-3 rounded-2xl rounded-bl-md border border-gray-100 shadow-md">
+            <div className="bg-gray-800/80 text-gray-100 px-4 py-3 rounded-2xl rounded-bl-md border border-gray-600/30 shadow-xl backdrop-blur-sm">
               <div className="flex space-x-2 items-center">
                 <div className="flex space-x-1">
                   <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
@@ -294,7 +295,7 @@ const ChatSidebar = ({ editorContent, onAIEdit, editor }) => {
       </div>
 
       {/* Input */}
-      <div className="p-6 border-t border-gray-200 bg-white">
+      <div className="p-6 border-t border-gray-600/50 bg-gradient-to-r from-gray-900 to-black">
         <div className="flex space-x-3">
           <div className="flex-1 relative">
             <textarea
@@ -302,7 +303,7 @@ const ChatSidebar = ({ editorContent, onAIEdit, editor }) => {
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Ask me anything about your document..."
-              className="w-full resize-none border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm"
+              className="w-full resize-none border border-gray-600/30 bg-gray-800/50 text-gray-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-gray-500 transition-all duration-200 shadow-lg backdrop-blur-sm placeholder-gray-400"
               rows="2"
               disabled={isLoading}
             />
@@ -310,12 +311,12 @@ const ChatSidebar = ({ editorContent, onAIEdit, editor }) => {
           <button
             onClick={handleSendMessage}
             disabled={!inputMessage.trim() || isLoading}
-            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+            className="px-6 py-3 bg-gradient-to-r from-gray-700 to-gray-900 text-white rounded-xl hover:from-gray-600 hover:to-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 border border-gray-600/30"
           >
             <Send className="w-5 h-5" />
           </button>
         </div>
-        <div className="mt-2 text-xs text-gray-500 flex items-center space-x-1">
+        <div className="mt-2 text-xs text-gray-400 flex items-center space-x-1">
           <span>💡</span>
           <span>Try: "Make this more professional" or "Fix grammar errors"</span>
         </div>

@@ -64,15 +64,15 @@ function MenuBar({ editor }) {
   if (!editor) return null
 
   return (
-    <div className="bg-gradient-to-r from-slate-50 to-gray-50 border-b border-gray-200 px-6 py-3">
+    <div className="bg-gradient-to-r from-gray-900 to-black border-b border-red-500/30 px-6 py-3">
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
           disabled={!editorState.canBold}
           className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
             editorState.isBold 
-              ? 'bg-blue-600 text-white shadow-md' 
-              : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+              ? 'bg-red-600 text-white shadow-lg border border-red-500/30' 
+              : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-red-500/20'
           }`}
         >
           Bold
@@ -82,8 +82,8 @@ function MenuBar({ editor }) {
           disabled={!editorState.canItalic}
           className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
             editorState.isItalic 
-              ? 'bg-blue-600 text-white shadow-md' 
-              : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+              ? 'bg-red-600 text-white shadow-lg border border-red-500/30' 
+              : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-red-500/20'
           }`}
         >
           Italic
@@ -93,8 +93,8 @@ function MenuBar({ editor }) {
           disabled={!editorState.canStrike}
           className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
             editorState.isStrike 
-              ? 'bg-blue-600 text-white shadow-md' 
-              : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+              ? 'bg-red-600 text-white shadow-lg border border-red-500/30' 
+              : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-red-500/20'
           }`}
         >
           Strike
@@ -104,21 +104,21 @@ function MenuBar({ editor }) {
           disabled={!editorState.canCode}
           className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
             editorState.isCode 
-              ? 'bg-blue-600 text-white shadow-md' 
-              : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+              ? 'bg-red-600 text-white shadow-lg border border-red-500/30' 
+              : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-red-500/20'
           }`}
         >
           Code
         </button>
         
-        <div className="w-px h-6 bg-gray-300 mx-1"></div>
+        <div className="w-px h-6 bg-red-500/30 mx-1"></div>
         
         <button
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
           className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-all duration-200 ${
             editorState.isHeading1 
-              ? 'bg-purple-600 text-white shadow-md' 
-              : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+              ? 'bg-red-700 text-white shadow-lg border border-red-500/30' 
+              : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-red-500/20'
           }`}
         >
           H1
@@ -127,8 +127,8 @@ function MenuBar({ editor }) {
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
           className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
             editorState.isHeading2 
-              ? 'bg-purple-600 text-white shadow-md' 
-              : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+              ? 'bg-red-700 text-white shadow-lg border border-red-500/30' 
+              : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-red-500/20'
           }`}
         >
           H2
@@ -137,21 +137,21 @@ function MenuBar({ editor }) {
           onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
           className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
             editorState.isHeading3 
-              ? 'bg-purple-600 text-white shadow-md' 
-              : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+              ? 'bg-red-700 text-white shadow-lg border border-red-500/30' 
+              : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-red-500/20'
           }`}
         >
           H3
         </button>
         
-        <div className="w-px h-6 bg-gray-300 mx-1"></div>
+        <div className="w-px h-6 bg-red-500/30 mx-1"></div>
         
         <button
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
             editorState.isBulletList 
-              ? 'bg-green-600 text-white shadow-md' 
-              : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+              ? 'bg-red-600 text-white shadow-lg border border-red-500/30' 
+              : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-red-500/20'
           }`}
         >
           • List
@@ -160,8 +160,8 @@ function MenuBar({ editor }) {
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
             editorState.isOrderedList 
-              ? 'bg-green-600 text-white shadow-md' 
-              : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+              ? 'bg-red-600 text-white shadow-lg border border-red-500/30' 
+              : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-red-500/20'
           }`}
         >
           1. List
@@ -170,8 +170,8 @@ function MenuBar({ editor }) {
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
           className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
             editorState.isBlockquote 
-              ? 'bg-orange-600 text-white shadow-md' 
-              : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+              ? 'bg-red-800 text-white shadow-lg border border-red-500/30' 
+              : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-red-500/20'
           }`}
         >
           Quote
@@ -180,26 +180,26 @@ function MenuBar({ editor }) {
           onClick={() => editor.chain().focus().toggleCodeBlock().run()}
           className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
             editorState.isCodeBlock 
-              ? 'bg-gray-800 text-white shadow-md' 
-              : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+              ? 'bg-gray-700 text-white shadow-lg border border-red-500/30' 
+              : 'bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-red-500/20'
           }`}
         >
           Code Block
         </button>
         
-        <div className="w-px h-6 bg-gray-300 mx-1"></div>
+        <div className="w-px h-6 bg-red-500/30 mx-1"></div>
         
         <button 
           onClick={() => editor.chain().focus().undo().run()} 
           disabled={!editorState.canUndo}
-          className="px-3 py-1.5 rounded-lg text-sm font-medium bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          className="px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
         >
           ↶ Undo
         </button>
         <button 
           onClick={() => editor.chain().focus().redo().run()} 
           disabled={!editorState.canRedo}
-          className="px-3 py-1.5 rounded-lg text-sm font-medium bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+          className="px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-800/50 text-gray-300 hover:bg-gray-700/50 hover:text-white border border-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
         >
           ↷ Redo
         </button>
@@ -523,14 +523,14 @@ export default function TiptapEditor({ onContentChange, onEditorReady }) {
   if (!editor) return null
 
   return (
-    <div className="flex flex-col h-full bg-white shadow-xl border border-gray-100 rounded-xl overflow-hidden">
+    <div className="flex flex-col h-full bg-gray-900 shadow-2xl border border-red-500/20 rounded-xl overflow-hidden ring-1 ring-red-500/10">
       {/* Fixed Header with MenuBar */}
-      <div className="flex-shrink-0 border-b border-gray-200">
+      <div className="flex-shrink-0 border-b border-red-500/30">
         <MenuBar editor={editor} />
       </div>
       
       {/* Scrollable Editor Content */}
-      <div className="flex-1 relative bg-white overflow-y-auto">
+      <div className="flex-1 relative bg-gradient-to-b from-gray-900 to-black overflow-y-auto">
         <EditorContent 
           editor={editor} 
           className="prose prose-lg max-w-none h-full"

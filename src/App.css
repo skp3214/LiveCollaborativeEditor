@@ -1,0 +1,139 @@
+/* Premium Dark Theme Enhancements */
+
+/* Global body styling for premium look */
+body {
+  background: linear-gradient(135deg, #000000 0%, #111827 50%, #000000 100%);
+  color: #ffffff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Premium glass effect for cards */
+.glass-effect {
+  background: rgba(31, 41, 55, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* Premium glow effects */
+.red-glow {
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+}
+
+.red-glow:hover {
+  box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
+}
+
+/* Premium text gradients */
+.text-gradient-red {
+  background: linear-gradient(135deg, #f87171, #dc2626);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Premium border animations */
+.border-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.border-glow::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, transparent, #dc2626, transparent);
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.border-glow:hover::before {
+  opacity: 0.6;
+}
+
+/* Premium scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(17, 24, 39, 0.8);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #dc2626, #991b1b);
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #ef4444, #dc2626);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+}
+
+/* Premium selection styling */
+::selection {
+  background: rgba(239, 68, 68, 0.8);
+  color: white;
+}
+
+::-moz-selection {
+  background: rgba(239, 68, 68, 0.8);
+  color: white;
+}
+
+/* Premium button hover effects */
+button {
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Premium focus states */
+*:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.5);
+}
+
+/* Premium loading animations */
+@keyframes pulse-red {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-red {
+  animation: pulse-red 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Premium shimmer effect */
+@keyframes shimmer {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.3), transparent);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite linear;
+}
