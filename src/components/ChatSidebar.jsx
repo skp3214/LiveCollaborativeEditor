@@ -58,14 +58,25 @@ const ChatSidebar = ({ editorContent, onAIEdit, editor }) => {
               
               let tableHTML = '<table><thead><tr>';
               headerRow.forEach(header => {
-                tableHTML += `<th>${header}</th>`;
+                // Process markdown in header cells
+                const processedHeader = header
+                  .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                  .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                  .replace(/`(.*?)`/g, '<code>$1</code>');
+                tableHTML += `<th>${processedHeader}</th>`;
               });
               tableHTML += '</tr></thead><tbody>';
               
               dataRows.forEach(row => {
                 tableHTML += '<tr>';
                 headerRow.forEach((_, colIndex) => {
-                  tableHTML += `<td>${row[colIndex] || ''}</td>`;
+                  const cellContent = row[colIndex] || '';
+                  // Process markdown in data cells
+                  const processedCell = cellContent
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/`(.*?)`/g, '<code>$1</code>');
+                  tableHTML += `<td>${processedCell}</td>`;
                 });
                 tableHTML += '</tr>';
               });

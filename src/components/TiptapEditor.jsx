@@ -356,7 +356,12 @@ export default function TiptapEditor({ onContentChange, onEditorReady }) {
             
             // Add header cells
             headerRow.forEach(header => {
-              tableHTML += `<th>${header}</th>`;
+              // Process markdown in header cells
+              const processedHeader = header
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/`(.*?)`/g, '<code>$1</code>');
+              tableHTML += `<th>${processedHeader}</th>`;
             });
             tableHTML += '</tr></thead><tbody>';
             
@@ -365,7 +370,12 @@ export default function TiptapEditor({ onContentChange, onEditorReady }) {
               tableHTML += '<tr>';
               row.forEach((cell, colIndex) => {
                 if (colIndex < headerRow.length) {
-                  tableHTML += `<td>${cell}</td>`;
+                  // Process markdown in data cells
+                  const processedCell = cell
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/`(.*?)`/g, '<code>$1</code>');
+                  tableHTML += `<td>${processedCell}</td>`;
                 }
               });
               // Fill missing cells if row is shorter than header
