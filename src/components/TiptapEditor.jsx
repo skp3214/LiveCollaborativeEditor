@@ -184,7 +184,7 @@ function MenuBar({ editor }) {
   )
 }
 
-export default function TiptapEditor({ onContentChange }) {
+export default function TiptapEditor({ onContentChange, onEditorReady }) {
   const [selectedText, setSelectedText] = useState('')
   const [toolbarPosition, setToolbarPosition] = useState(null)
   const [showPreview, setShowPreview] = useState(false)
@@ -239,6 +239,13 @@ export default function TiptapEditor({ onContentChange }) {
       }
     }
   })
+
+  // Notify parent when editor is ready
+  useEffect(() => {
+    if (editor && onEditorReady) {
+      onEditorReady(editor)
+    }
+  }, [editor, onEditorReady])
 
   const handleEditAction = useCallback(async (text, actionType) => {
     // Store the current selection range before opening the modal

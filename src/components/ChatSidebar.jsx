@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Send, Bot, User } from 'lucide-react'
+import { Send, Bot, User, Plus } from 'lucide-react'
 import { aiService } from '../services/aiService'
 
-const ChatSidebar = ({ editorContent, onAIEdit }) => {
+const ChatSidebar = ({ editorContent, onAIEdit, editor }) => {
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -16,6 +16,13 @@ const ChatSidebar = ({ editorContent, onAIEdit }) => {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  const insertToEditor = (content) => {
+    if (editor) {
+      // Insert content at the current cursor position
+      editor.chain().focus().insertContent(content).run()
+    }
   }
 
   useEffect(() => {
@@ -116,6 +123,19 @@ const ChatSidebar = ({ editorContent, onAIEdit }) => {
               }`}
             >
               <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+              
+              {/* Insert to Editor button for AI messages */}
+              {message.type === 'ai' && message.id !== 1 && (
+                <div className="mt-3 pt-3 border-t border-gray-100">
+                  <button
+                    onClick={() => insertToEditor(message.content)}
+                    className="inline-flex items-center space-x-2 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors duration-200"
+                  >
+                    <Plus className="w-3 h-3" />
+                    <span>Insert to Editor</span>
+                  </button>
+                </div>
+              )}
             </div>
 
             {message.type === 'user' && (

@@ -5,9 +5,14 @@ import './App.css'
 
 const App = () => {
   const [editorContent, setEditorContent] = useState('')
+  const [editorInstance, setEditorInstance] = useState(null)
 
   const handleContentChange = (content) => {
     setEditorContent(content)
+  }
+
+  const handleEditorReady = (editor) => {
+    setEditorInstance(editor)
   }
 
   return (
@@ -48,7 +53,10 @@ const App = () => {
         <div className="flex-1 flex flex-col">
           <div className="flex-1 p-8 overflow-hidden">
             <div className="h-full bg-white/60 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20 overflow-hidden">
-              <TiptapEditor onContentChange={handleContentChange} />
+              <TiptapEditor 
+                onContentChange={handleContentChange} 
+                onEditorReady={handleEditorReady}
+              />
             </div>
           </div>
         </div>
@@ -57,6 +65,7 @@ const App = () => {
         <div className="w-96 h-full">
           <ChatSidebar 
             editorContent={editorContent}
+            editor={editorInstance}
             onAIEdit={() => {}} // This could be expanded for direct AI edits from chat
           />
         </div>
