@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Send, Bot, User, Plus } from 'lucide-react'
+import { marked } from 'marked'
 import { aiService } from '../services/aiService'
 
 const ChatSidebar = ({ editorContent, onAIEdit, editor }) => {
@@ -20,8 +21,43 @@ const ChatSidebar = ({ editorContent, onAIEdit, editor }) => {
 
   const insertToEditor = (content) => {
     if (editor) {
-      // Insert content at the current cursor position
-      editor.chain().focus().insertContent(content).run()
+      // Check if content contains markdown syntax
+      const hasMarkdown = content.includes('**') || content.includes('*') || 
+                         content.includes('#') || content.includes('`') ||
+                         content.includes('- ') || content.includes('> ') ||
+                         content.includes('|') || content.includes('```');
+      
+      if (hasMarkdown) {
+        try {
+          // Configure marked options for better parsing
+          marked.setOptions({
+            breaks: true,
+            gfm: true, // GitHub Flavored Markdown
+            tables: true,
+            sanitize: false
+          });
+          
+          // Parse markdown to HTML
+          const htmlContent = marked(content);
+          
+          // Insert the parsed HTML content
+          editor.chain().focus().insertContent(htmlContent).run();
+          
+        } catch (error) {
+          console.error('Markdown parsing error:', error);
+          // Fallback: Try inserting raw markdown with proper line breaks
+          const formattedContent = content.replace(/\n/g, '<br>');
+          try {
+            editor.chain().focus().insertContent(formattedContent).run();
+          } catch (fallbackError) {
+            // Last resort: plain text insertion
+            editor.chain().focus().insertContent(content).run();
+          }
+        }
+      } else {
+        // For plain text, just insert normally
+        editor.chain().focus().insertContent(content).run();
+      }
     }
   }
 

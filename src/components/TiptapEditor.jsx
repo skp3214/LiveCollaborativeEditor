@@ -1,12 +1,25 @@
 import { useEditor, EditorContent, useEditorState } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { TextStyle } from '@tiptap/extension-text-style'
+import Typography from '@tiptap/extension-typography'
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
+import { createLowlight, common } from 'lowlight'
 import React, { useState, useCallback, useEffect } from 'react'
 import FloatingToolbar from './FloatingToolbar'
 import PreviewModal from './PreviewModal'
 import { aiService } from '../services/aiService'
 
-const extensions = [TextStyle, StarterKit]
+// Create lowlight instance with common languages
+const lowlight = createLowlight(common)
+
+const extensions = [
+  TextStyle, 
+  StarterKit, 
+  Typography,
+  CodeBlockLowlight.configure({
+    lowlight,
+  })
+]
 
 function MenuBar({ editor }) {
   const editorState = useEditorState({
@@ -369,13 +382,17 @@ export default function TiptapEditor({ onContentChange, onEditorReady }) {
   if (!editor) return null
 
   return (
-    <div className="bg-white shadow-xl border border-gray-100 rounded-xl overflow-hidden">
-      <MenuBar editor={editor} />
+    <div className="flex flex-col h-full bg-white shadow-xl border border-gray-100 rounded-xl overflow-hidden">
+      {/* Fixed Header with MenuBar */}
+      <div className="flex-shrink-0 border-b border-gray-200">
+        <MenuBar editor={editor} />
+      </div>
       
-      <div className="relative bg-white">
+      {/* Scrollable Editor Content */}
+      <div className="flex-1 relative bg-white overflow-y-auto">
         <EditorContent 
           editor={editor} 
-          className="prose prose-lg max-w-none"
+          className="prose prose-lg max-w-none h-full"
         />
         
         <FloatingToolbar

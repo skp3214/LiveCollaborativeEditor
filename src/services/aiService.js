@@ -10,7 +10,21 @@ export class AIService {
 
   async chat(message) {
     try {
-      const result = await this.model.generateContent(message)
+      const enhancedPrompt = `${message}
+
+Please format your response using markdown syntax where appropriate. Use:
+- **bold** for emphasis
+- *italics* for secondary emphasis  
+- # ## ### for headings
+- - or * for bullet points
+- \`code\` for inline code
+- \`\`\`language code blocks for multi-line code
+- > for blockquotes
+- Tables with | separators when showing data
+
+Provide a well-formatted, readable response.`
+
+      const result = await this.model.generateContent(enhancedPrompt)
       const response = await result.response
       return response.text()
     } catch (error) {
@@ -21,17 +35,33 @@ export class AIService {
 
   async editText(text, action) {
     const prompts = {
-      shorten: `Shorten this text while keeping the main meaning: "${text}"`,
-      expand: `Expand this text with more details and context: "${text}"`,
-      grammar: `Fix grammar and improve clarity of this text: "${text}"`,
-      formal: `Make this text more formal and professional: "${text}"`,
-      casual: `Make this text more casual and conversational: "${text}"`,
-      table: `Convert this text into a well-formatted HTML table if possible, otherwise explain why it can't be converted: "${text}"`,
-      bullet: `Convert this text into bullet points: "${text}"`,
-      summarize: `Summarize this text in 2-3 sentences: "${text}"`
+      shorten: `Shorten this text while keeping the main meaning: "${text}"
+
+Please format your response using markdown syntax where appropriate.`,
+      expand: `Expand this text with more details and context: "${text}"
+
+Please format your response using proper markdown syntax with headings, bold text, bullet points, etc. where appropriate.`,
+      grammar: `Fix grammar and improve clarity of this text: "${text}"
+
+Please return the corrected text using markdown formatting.`,
+      formal: `Make this text more formal and professional: "${text}"
+
+Please format your response using markdown syntax where appropriate.`,
+      casual: `Make this text more casual and conversational: "${text}"
+
+Please format your response using markdown syntax where appropriate.`,
+      table: `Convert this text into a well-formatted markdown table if possible, otherwise explain why it can't be converted: "${text}"
+
+Use proper markdown table syntax with | separators and alignment.`,
+      bullet: `Convert this text into bullet points using markdown syntax: "${text}"
+
+Use - or * for bullet points and format with proper markdown.`,
+      summarize: `Summarize this text in 2-3 sentences: "${text}"
+
+Please format your response using markdown syntax with **bold** for key points.`
     }
 
-    const prompt = prompts[action] || `Edit this text: "${text}"`
+    const prompt = prompts[action] || `Edit this text using markdown formatting: "${text}"`
     
     try {
       const result = await this.model.generateContent(prompt)
@@ -56,6 +86,15 @@ export class AIService {
     3. Provides general writing advice
     
     If you're suggesting edits, be specific about what parts to change.
+    
+    Please format your response using markdown syntax where appropriate:
+    - Use **bold** for emphasis
+    - Use *italics* for secondary emphasis  
+    - Use # ## ### for headings
+    - Use - or * for bullet points
+    - Use \`code\` for inline code
+    - Use > for blockquotes
+    - Use tables with | separators when showing data
     `
 
     try {
