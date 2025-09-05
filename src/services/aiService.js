@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
-// Initialize the AI with your API key
-const genAI = new GoogleGenerativeAI('AIzaSyDWjw7CDm4PnwpdwHKPch3t9K_1rYMY67E')
+// Initialize the AI with your API key from environment variables
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_AI_API_KEY)
 
 export class AIService {
   constructor() {
