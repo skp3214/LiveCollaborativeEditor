@@ -21,43 +21,118 @@ const ChatSidebar = ({ editorContent, onAIEdit, editor }) => {
 
   const insertToEditor = (content) => {
     if (editor) {
-      // Check if content contains markdown syntax
-      const hasMarkdown = content.includes('**') || content.includes('*') || 
-                         content.includes('#') || content.includes('`') ||
-                         content.includes('- ') || content.includes('> ') ||
-                         content.includes('|') || content.includes('```');
+      // More precise table detection
+      const tablePattern = /^\s*\|.*\|\s*\n\s*\|[-:\s|]+\|\s*\n(\s*\|.*\|\s*\n?)+/gm;
+      const tableMatches = [...content.matchAll(tablePattern)];
       
-      if (hasMarkdown) {
-        try {
-          // Configure marked options for better parsing
-          marked.setOptions({
-            breaks: true,
-            gfm: true, // GitHub Flavored Markdown
-            tables: true,
-            sanitize: false
-          });
+      if (tableMatches.length > 0) {
+        let lastIndex = 0;
+        
+        // Process each table match
+        for (const match of tableMatches) {
+          const tableStart = match.index;
+          const tableContent = match[0];
+          const tableEnd = tableStart + tableContent.length;
           
-          // Parse markdown to HTML
-          const htmlContent = marked(content);
+          // Insert content before this table
+          if (tableStart > lastIndex) {
+            const beforeContent = content.substring(lastIndex, tableStart).trim();
+            if (beforeContent) {
+              insertMarkdownContent(beforeContent);
+            }
+          }
           
-          // Insert the parsed HTML content
-          editor.chain().focus().insertContent(htmlContent).run();
+          // Process the table
+          const lines = tableContent.trim().split('\n').filter(line => line.trim());
+          const dataLines = lines.filter(line => 
+            line.includes('|') && !line.match(/^\s*\|[-:\s|]+\|\s*$/)
+          );
           
-        } catch (error) {
-          console.error('Markdown parsing error:', error);
-          // Fallback: Try inserting raw markdown with proper line breaks
-          const formattedContent = content.replace(/\n/g, '<br>');
-          try {
-            editor.chain().focus().insertContent(formattedContent).run();
-          } catch (fallbackError) {
-            // Last resort: plain text insertion
-            editor.chain().focus().insertContent(content).run();
+          if (dataLines.length >= 2) {
+            const rows = dataLines.map(line => 
+              line.split('|').map(cell => cell.trim()).filter(cell => cell !== '')
+            );
+            
+            if (rows.length > 0 && rows[0].length > 0) {
+              const [headerRow, ...dataRows] = rows;
+              
+              let tableHTML = '<table><thead><tr>';
+              headerRow.forEach(header => {
+                tableHTML += `<th>${header}</th>`;
+              });
+              tableHTML += '</tr></thead><tbody>';
+              
+              dataRows.forEach(row => {
+                tableHTML += '<tr>';
+                headerRow.forEach((_, colIndex) => {
+                  tableHTML += `<td>${row[colIndex] || ''}</td>`;
+                });
+                tableHTML += '</tr>';
+              });
+              
+              tableHTML += '</tbody></table>';
+              
+              // Insert the table with some spacing
+              editor.chain().focus().insertContent(tableHTML + '<p></p>').run();
+            }
+          }
+          
+          lastIndex = tableEnd;
+        }
+        
+        // Insert any remaining content after the last table
+        if (lastIndex < content.length) {
+          const remainingContent = content.substring(lastIndex).trim();
+          if (remainingContent) {
+            // Add a small delay to ensure proper insertion order
+            setTimeout(() => {
+              insertMarkdownContent(remainingContent);
+            }, 50);
           }
         }
       } else {
-        // For plain text, just insert normally
-        editor.chain().focus().insertContent(content).run();
+        // No tables found, process as regular markdown
+        insertMarkdownContent(content);
       }
+    }
+  }
+  
+  const insertMarkdownContent = (content) => {
+    // Check if content contains markdown syntax
+    const hasMarkdown = content.includes('**') || content.includes('*') || 
+                       content.includes('#') || content.includes('`') ||
+                       content.includes('- ') || content.includes('> ') ||
+                       content.includes('```');
+    
+    if (hasMarkdown) {
+      try {
+        // Configure marked options for better parsing
+        marked.setOptions({
+          breaks: true,
+          gfm: true, // GitHub Flavored Markdown
+          sanitize: false
+        });
+        
+        // Parse markdown to HTML
+        const htmlContent = marked(content);
+        
+        // Insert the parsed HTML content
+        editor.chain().focus().insertContent(htmlContent).run();
+        
+      } catch (error) {
+        console.error('Markdown parsing error:', error);
+        // Fallback: Try inserting raw markdown with proper line breaks
+        const formattedContent = content.replace(/\n/g, '<br>');
+        try {
+          editor.chain().focus().insertContent(formattedContent).run();
+        } catch (fallbackError) {
+          // Last resort: plain text insertion
+          editor.chain().focus().insertContent(content).run();
+        }
+      }
+    } else {
+      // For plain text, just insert normally
+      editor.chain().focus().insertContent(content).run();
     }
   }
 

@@ -3,7 +3,12 @@ import StarterKit from '@tiptap/starter-kit'
 import { TextStyle } from '@tiptap/extension-text-style'
 import Typography from '@tiptap/extension-typography'
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
+import { Table } from '@tiptap/extension-table'
+import { TableRow } from '@tiptap/extension-table-row'
+import { TableHeader } from '@tiptap/extension-table-header'
+import { TableCell } from '@tiptap/extension-table-cell'
 import { createLowlight, common } from 'lowlight'
+import { marked } from 'marked'
 import React, { useState, useCallback, useEffect } from 'react'
 import FloatingToolbar from './FloatingToolbar'
 import PreviewModal from './PreviewModal'
@@ -13,9 +18,15 @@ import { aiService } from '../services/aiService'
 const lowlight = createLowlight(common)
 
 const extensions = [
+  StarterKit,
   TextStyle, 
-  StarterKit, 
   Typography,
+  Table.configure({
+    resizable: true,
+  }),
+  TableRow,
+  TableHeader,
+  TableCell,
   CodeBlockLowlight.configure({
     lowlight,
   })
@@ -291,6 +302,122 @@ export default function TiptapEditor({ onContentChange, onEditorReady }) {
     }
   }, [editor])
 
+  const insertMarkdownContent = useCallback((content) => {
+    if (!editor) return;
+    
+    // Check if content contains table markdown
+    const hasTable = content.includes('|') && content.includes('---');
+    
+    if (hasTable) {
+      // Parse table markdown more carefully
+      const lines = content.split('\n').filter(line => line.trim());
+      let tableStart = -1;
+      let tableEnd = -1;
+      
+      // Find table boundaries
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].includes('|')) {
+          if (tableStart === -1) tableStart = i;
+          tableEnd = i;
+        } else if (tableStart !== -1) {
+          break; // End of table found
+        }
+      }
+      
+      if (tableStart !== -1 && tableEnd > tableStart) {
+        const tableLines = lines.slice(tableStart, tableEnd + 1);
+        
+        // Filter out separator row (contains --- or similar)
+        const dataLines = tableLines.filter(line => !line.includes('---') && !line.includes('==='));
+        
+        if (dataLines.length >= 1) {
+          // Parse table data
+          const rows = dataLines.map(line => 
+            line.split('|')
+              .map(cell => cell.trim())
+              .filter(cell => cell !== '')
+          );
+          
+          // Filter out any empty rows
+          const validRows = rows.filter(row => row.length > 0);
+          
+          if (validRows.length > 0) {
+            const headerRow = validRows[0];
+            const dataRows = validRows.slice(1);
+            
+            // Insert content before table
+            const beforeTable = lines.slice(0, tableStart).join('\n');
+            if (beforeTable.trim()) {
+              insertMarkdownContent(beforeTable);
+            }
+            
+            // Create HTML table instead of using Tiptap table commands
+            let tableHTML = '<table><thead><tr>';
+            
+            // Add header cells
+            headerRow.forEach(header => {
+              tableHTML += `<th>${header}</th>`;
+            });
+            tableHTML += '</tr></thead><tbody>';
+            
+            // Add data rows
+            dataRows.forEach(row => {
+              tableHTML += '<tr>';
+              row.forEach((cell, colIndex) => {
+                if (colIndex < headerRow.length) {
+                  tableHTML += `<td>${cell}</td>`;
+                }
+              });
+              // Fill missing cells if row is shorter than header
+              for (let i = row.length; i < headerRow.length; i++) {
+                tableHTML += '<td></td>';
+              }
+              tableHTML += '</tr>';
+            });
+            
+            tableHTML += '</tbody></table>';
+            
+            // Insert the HTML table
+            editor.chain().focus().insertContent(tableHTML).run();
+            
+            // Insert content after table
+            const afterTable = lines.slice(tableEnd + 1).join('\n');
+            if (afterTable.trim()) {
+              setTimeout(() => {
+                editor.chain().focus().insertContent('<p></p>').run(); // Add spacing
+                insertMarkdownContent(afterTable);
+              }, 200);
+            }
+          }
+        }
+      }
+    } else {
+      // Handle other markdown content - use marked for conversion
+      const hasMarkdown = content.includes('**') || content.includes('*') || 
+                         content.includes('#') || content.includes('`') ||
+                         content.includes('- ') || content.includes('> ') ||
+                         content.includes('```');
+      
+      if (hasMarkdown) {
+        try {
+          marked.setOptions({
+            breaks: true,
+            gfm: true,
+            sanitize: false
+          });
+          
+          const htmlContent = marked(content);
+          editor.chain().focus().insertContent(htmlContent).run();
+        } catch (error) {
+          console.error('Markdown parsing error:', error);
+          editor.chain().focus().insertContent(content).run();
+        }
+      } else {
+        editor.chain().focus().insertContent(content).run();
+      }
+    }
+  }, [editor]);
+
   const handleConfirmEdit = useCallback(() => {
     if (!editor || !previewData.suggested || selectionRange.from === selectionRange.to) {
       return
@@ -300,7 +427,11 @@ export default function TiptapEditor({ onContentChange, onEditorReady }) {
     const { from, to } = selectionRange
     
     try {
-      editor.chain().focus().deleteRange({ from, to }).insertContent(previewData.suggested).run()
+      // Delete the selected range first
+      editor.chain().focus().deleteRange({ from, to }).run()
+      
+      // Insert the content using our markdown-aware function
+      insertMarkdownContent(previewData.suggested)
     } catch (error) {
       console.error('Error replacing text:', error)
     }
@@ -309,7 +440,7 @@ export default function TiptapEditor({ onContentChange, onEditorReady }) {
     setSelectedText('')
     setToolbarPosition(null)
     setSelectionRange({ from: 0, to: 0 })
-  }, [editor, previewData.suggested, selectionRange])
+  }, [editor, previewData.suggested, selectionRange, insertMarkdownContent])
 
   const handleCancelEdit = useCallback(() => {
     setShowPreview(false)
