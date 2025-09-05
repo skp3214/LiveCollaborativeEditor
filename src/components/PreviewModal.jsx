@@ -1,4 +1,5 @@
 import React from 'react'
+import { createPortal } from 'react-dom'
 import { X, Check, RefreshCw } from 'lucide-react'
 
 const PreviewModal = ({ 
@@ -13,6 +14,19 @@ const PreviewModal = ({
 }) => {
   if (!isOpen) return null
 
+  // Prevent body scroll when modal is open
+  React.useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen])
+
   const actionLabels = {
     shorten: 'Shortened Text',
     expand: 'Expanded Text',
@@ -24,17 +38,17 @@ const PreviewModal = ({
     summarize: 'Summary'
   }
 
-  return (
-    <div className="fixed inset-0 z-50 overflow-y-auto modal-overlay">
+  const modalContent = (
+    <div className="fixed inset-0 z-[9999] overflow-y-auto modal-overlay">
       <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         {/* Background overlay */}
         <div 
-          className="fixed inset-0 transition-opacity bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 transition-opacity bg-black/60 backdrop-blur-md"
           onClick={onCancel}
         ></div>
 
         {/* Modal */}
-        <div className="modal-content inline-block w-full max-w-6xl p-0 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-2xl border border-gray-200">
+        <div className="modal-content inline-block w-full max-w-6xl p-0 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-2xl rounded-2xl border border-gray-200 relative z-[10000]">
           {/* Header */}
           <div className="flex items-center justify-between p-6 bg-gradient-to-r from-slate-50 to-gray-50 border-b border-gray-200">
             <div className="flex items-center space-x-3">
@@ -126,7 +140,18 @@ const PreviewModal = ({
               </button>
               
               <button
-                onClick={onConfirm}
+                onClick={() => {
+                  console.log('Apply Changes button clicked')
+                  console.log('onConfirm function:', !!onConfirm)
+                  console.log('isLoading:', isLoading)
+                  console.log('suggestedText:', !!suggestedText)
+                  console.log('button disabled:', isLoading || !suggestedText)
+                  if (onConfirm) {
+                    onConfirm()
+                  } else {
+                    console.error('onConfirm function is not defined')
+                  }
+                }}
                 disabled={isLoading || !suggestedText}
                 className="inline-flex items-center px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 border border-transparent rounded-lg hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
@@ -139,6 +164,8 @@ const PreviewModal = ({
       </div>
     </div>
   )
+
+  return createPortal(modalContent, document.body)
 }
 
 export default PreviewModal

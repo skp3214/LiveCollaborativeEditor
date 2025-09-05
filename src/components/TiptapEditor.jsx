@@ -188,6 +188,7 @@ export default function TiptapEditor({ onContentChange }) {
   const [selectedText, setSelectedText] = useState('')
   const [toolbarPosition, setToolbarPosition] = useState(null)
   const [showPreview, setShowPreview] = useState(false)
+  const [selectionRange, setSelectionRange] = useState({ from: 0, to: 0 })
   const [previewData, setPreviewData] = useState({
     original: '',
     suggested: '',
@@ -218,8 +219,14 @@ export default function TiptapEditor({ onContentChange }) {
       const { from, to, empty } = editor.state.selection
       
       if (empty) {
-        setSelectedText('')
-        setToolbarPosition(null)
+        // Only clear if there's no selection - add delay to prevent flicker
+        setTimeout(() => {
+          const currentSelection = editor.state.selection
+          if (currentSelection.empty) {
+            setSelectedText('')
+            setToolbarPosition(null)
+          }
+        }, 150)
         return
       }
 
@@ -232,10 +239,12 @@ export default function TiptapEditor({ onContentChange }) {
         const start = view.coordsAtPos(from)
         const end = view.coordsAtPos(to)
         
-        setToolbarPosition({
+        const newPosition = {
           x: (start.left + end.left) / 2,
           y: start.top
-        })
+        }
+        
+        setToolbarPosition(newPosition)
       } else {
         setSelectedText('')
         setToolbarPosition(null)
@@ -244,6 +253,12 @@ export default function TiptapEditor({ onContentChange }) {
   })
 
   const handleEditAction = useCallback(async (text, actionType) => {
+    // Store the current selection range before opening the modal
+    if (editor) {
+      const { from, to } = editor.state.selection
+      setSelectionRange({ from, to })
+    }
+    
     setPreviewData({
       original: text,
       suggested: '',
@@ -266,21 +281,41 @@ export default function TiptapEditor({ onContentChange }) {
         isLoading: false
       }))
     }
-  }, [])
+  }, [editor])
 
   const handleConfirmEdit = useCallback(() => {
-    if (!editor || !selectedText || !previewData.suggested) return
+    console.log('handleConfirmEdit called')
+    console.log('editor:', !!editor)
+    console.log('previewData.suggested:', previewData.suggested)
+    console.log('selectionRange:', selectionRange)
+    
+    if (!editor || !previewData.suggested || selectionRange.from === selectionRange.to) {
+      console.log('Early return due to missing data')
+      return
+    }
 
-    const { from, to } = editor.state.selection
-    editor.chain().focus().deleteRange({ from, to }).insertContent(previewData.suggested).run()
+    // Use the stored selection range instead of current selection
+    const { from, to } = selectionRange
+    console.log('Replacing text from', from, 'to', to, 'with:', previewData.suggested)
+    
+    try {
+      editor.chain().focus().deleteRange({ from, to }).insertContent(previewData.suggested).run()
+      console.log('Text replacement successful')
+    } catch (error) {
+      console.error('Error replacing text:', error)
+    }
     
     setShowPreview(false)
     setSelectedText('')
     setToolbarPosition(null)
-  }, [editor, selectedText, previewData.suggested])
+    setSelectionRange({ from: 0, to: 0 })
+    
+    console.log('Modal should be closed now')
+  }, [editor, previewData.suggested, selectionRange])
 
   const handleCancelEdit = useCallback(() => {
     setShowPreview(false)
+    setSelectionRange({ from: 0, to: 0 })
   }, [])
 
   const handleRegenerateEdit = useCallback(async () => {
@@ -315,15 +350,36 @@ export default function TiptapEditor({ onContentChange }) {
 
   // Close toolbar when clicking outside
   useEffect(() => {
-    const handleClickOutside = () => {
-      if (!showPreview) {
+    const handleClickOutside = (event) => {
+      if (!showPreview && toolbarPosition) {
+        // Check if click is on floating toolbar or its children
+        const toolbar = document.querySelector('.floating-toolbar')
+        if (toolbar && (toolbar.contains(event.target) || toolbar === event.target)) {
+          return // Don't close if clicking on toolbar
+        }
+        
+        // Check if click is on editor content (text selection)
+        const editorContent = document.querySelector('.ProseMirror')
+        if (editorContent && (editorContent.contains(event.target) || editorContent === event.target)) {
+          // Don't close immediately on editor clicks - let selection update handle it
+          return
+        }
+        
+        // Close toolbar for clicks outside editor and toolbar
         closeToolbar()
       }
     }
 
-    document.addEventListener('click', handleClickOutside)
-    return () => document.removeEventListener('click', handleClickOutside)
-  }, [showPreview, closeToolbar])
+    // Add a small delay to prevent immediate closure on text selection
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('click', handleClickOutside)
+    }, 100)
+    
+    return () => {
+      clearTimeout(timeoutId)
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [showPreview, closeToolbar, toolbarPosition])
 
   if (!editor) return null
 
