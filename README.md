@@ -3,8 +3,7 @@
 A sophisticated, AI-powered rich text editor built with React and TipTap. Experience seamless document editing with intelligent AI assistance, premium monochromatic design, and advanced formatting capabilities.
 
 ## 🌟 Live Demo
-![Uploading image.png…]()
-
+<img width="3200" height="2000" alt="image" src="https://github.com/user-attachments/assets/1a879214-9adc-479d-8f34-a3011b7021a1" />
 **[Try it now →](https://live-collaborative-editor-theta.vercel.app/)**
 
 ## ✨ Features
